@@ -154,7 +154,7 @@ export const DashboardLayout = () => {
             <Logo showText={false} size={36} />
           </span>
           <span className="whitespace-nowrap text-lg font-bold tracking-tight text-fg opacity-0 transition-opacity duration-200 group-hover:opacity-100">
-            <span className="text-brand-600">AI</span>
+            Intake <span className="text-brand-600">AI</span>
           </span>
         </button>
 
