@@ -6,6 +6,7 @@ import { notFound, errorHandler } from "./middleware/errorHandler.middleware";
 import authRoutes from "./routes/auth.routes";
 import formRoutes from "./routes/form.routes";
 import responseRoutes from "./routes/response.routes";
+import insightsRoutes from "./routes/insights.routes";
 
 const app = express();
 
@@ -41,6 +42,7 @@ app.get("/api/health", (_req: Request, res: Response) => {
 app.use("/api/auth", authRoutes);
 app.use("/api/forms", formRoutes);
 app.use("/api", responseRoutes);
+app.use("/api", insightsRoutes);
 
 // Error handlers
 app.use(notFound);
