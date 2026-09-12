@@ -33,10 +33,12 @@ export const errorHandler: ErrorRequestHandler = (
     );
     error = ApiError.badRequest("Validation Failed", details);
   }
+
   // Handle invalid UUID/ID cast failures
   else if (error.name === "CastError") {
     error = ApiError.badRequest(`Invalid ${error.path}: ${error.value}`);
   }
+
   // Handle DB duplicate key (11000) or Postgres unique constraint violation (23505)
   else if (error.code === 11000 || error.code === "23505") {
     const field = error.keyValue
@@ -44,6 +46,7 @@ export const errorHandler: ErrorRequestHandler = (
       : error.detail?.match(/Key \((.*?)\)=/)?.[1] || "field";
     error = ApiError.conflict(`${field} already exists`);
   }
+
   // Fallback generic unhandled errors into an ApiError instance
   else if (!(error instanceof ApiError)) {
     error = ApiError.internal(error?.message);
