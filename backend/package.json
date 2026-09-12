@@ -8,7 +8,7 @@
   "scripts": {
     "dev": "bun --watch server.ts",
     "start": "bun server.ts",
-    "seed": "bun scripts/seed.ts"
+    "seed": "bun utils/seed.ts"
   },
   "devDependencies": {
     "@types/bcryptjs": "^3.0.0",
