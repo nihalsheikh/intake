@@ -7,6 +7,7 @@ import authRoutes from "./routes/auth.routes";
 import formRoutes from "./routes/form.routes";
 import responseRoutes from "./routes/response.routes";
 import insightsRoutes from "./routes/insights.routes";
+import aiRoutes from "./routes/ai.routes";
 
 const app = express();
 
@@ -43,6 +44,7 @@ app.use("/api/auth", authRoutes);
 app.use("/api/forms", formRoutes);
 app.use("/api", responseRoutes);
 app.use("/api", insightsRoutes);
+app.use("/api/ai", aiRoutes);
 
 // Error handlers
 app.use(notFound);
