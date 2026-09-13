@@ -1,4 +1,5 @@
 import axios from "axios";
+import { envConfig } from "../config/envConfig";
 
 // Local storage key used to persist the active user's JWT access token
 export const TOKEN_KEY = "intake_token";
@@ -13,7 +14,7 @@ export const setToken = (token: string): void =>
 // Removes the session token from local storage on sign out
 export const clearToken = (): void => localStorage.removeItem(TOKEN_KEY);
 
-const API_BASE = import.meta.env.VITE_API_URL || "http://localhost:5000/api";
+const API_BASE = envConfig.apiUrl;
 
 // Configured Axios HTTP client instance for backend communication
 const api = axios.create({
