@@ -47,7 +47,7 @@ export default function Login() {
   const fillDemo = () => {
     // Set through RHF (not the DOM) so form state + validation stay in sync.
     setValue("email", "alex@timetoprogram.dev", { shouldValidate: true });
-    setValue("password", "Test@1234", { shouldValidate: true });
+    setValue("password", "Test#1234", { shouldValidate: true });
   };
 
   return (

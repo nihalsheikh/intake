@@ -363,7 +363,7 @@ const FORMS = [
   },
   {
     title: "Newsletter Signup",
-    description: "Get the best of Formly in your inbox.",
+    description: "Get the best of Intake in your inbox.",
     theme: "glassmorphism",
     color: "#db2777",
     status: "published",

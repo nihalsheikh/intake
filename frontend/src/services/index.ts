@@ -1,117 +1,69 @@
-import { mock } from "@/services/mockData";
-import type {
-  User,
-  LoginCredentials,
-  RegisterPayload,
-  AuthResponse,
-} from "@/types/user";
-import type {
-  Form,
-  FormField,
-  FieldValidation,
-  AIImproveQuestionResult,
-  AIFormSummaryResult,
-} from "@/types/forms";
-import type {
-  OverviewInsights,
-  FormAnalytics,
-  FormResponseItem,
-  InboxResponse,
-} from "@/types/analytics";
+import api from "../lib/api";
 
-// Artificial latency helpers
-const wait = (ms: number): Promise<void> =>
-  new Promise((res) => setTimeout(res, ms));
-
-const net = async <T>(
-  fn: () => T,
-  ms: number = 300 + Math.random() * 350,
-): Promise<T> => {
-  await wait(ms);
-  return fn();
-};
-
-const slow = <T>(fn: () => T): Promise<T> => net(fn, 900 + Math.random() * 600);
-
-// Auth endpoints
+// --- Auth ---
 export const authApi = {
-  register: (payload: RegisterPayload): Promise<AuthResponse> =>
-    net(() => (mock as any).register(payload)),
-  login: (credentials: LoginCredentials): Promise<AuthResponse> =>
-    net(() => (mock as any).login(credentials)),
-  me: (): Promise<{ user: User }> => net(() => mock.me()),
-  updateProfile: (payload: Partial<User>): Promise<User> =>
-    net(() => (mock as any).updateProfile(payload)),
-  changePassword: (): Promise<{ success: boolean; message: string }> =>
-    net(() => ({ success: true, message: "Password changed" })),
-  deleteAccount: (): Promise<{ success: boolean; message: string }> =>
-    net(() => ({ success: true, message: "Account deleted" })),
+  register: (payload: any) =>
+    api.post("/auth/register", payload).then((r) => r.data.data),
+  login: (payload: any) =>
+    api.post("/auth/login", payload).then((r) => r.data.data),
+  me: () => api.get("/auth/me").then((r) => r.data.data),
+  updateProfile: (payload: any) =>
+    api.put("/auth/profile", payload).then((r) => r.data.data.user),
+  changePassword: (payload: any) =>
+    api.put("/auth/password", payload).then((r) => r.data),
+  deleteAccount: () => api.delete("/auth/me").then((r) => r.data),
 };
 
-// Workspace-wide endpoints
+// --- Workspace-wide ---
 export const insightsApi = {
-  overview: (): Promise<OverviewInsights> =>
-    net(() => (mock as any).insights(), 500 + Math.random() * 400),
-  inbox: (params?: {
-    filter?: string;
-    search?: string;
-  }): Promise<InboxResponse> => net(() => mock.inbox(params || {})),
+  overview: () => api.get("/insights").then((r) => r.data.data.insights),
+  inbox: (params?: any) =>
+    api.get("/inbox", { params }).then((r) => r.data.data),
 };
 
-// Form management endpoints
+// --- Forms ---
 export const formApi = {
-  list: (params?: { search?: string; filter?: string }): Promise<Form[]> =>
-    net(() => mock.listForms(params || {})),
-  get: (id: string): Promise<Form> => net(() => mock.getForm(id)),
-  getPublic: (slug: string): Promise<Form> =>
-    net(() => mock.getPublicForm(slug)),
-  create: (payload: Partial<Form>): Promise<Form> =>
-    net(() => (mock as any).createForm(payload)),
-  update: (id: string, payload: Partial<Form>): Promise<Form> =>
-    net(() => (mock as any).updateForm(id, payload)),
-  publish: (id: string, publish: boolean = true): Promise<Form> =>
-    net(() => mock.publishForm(id, publish)),
-  duplicate: (id: string): Promise<Form> => net(() => mock.duplicateForm(id)),
-  remove: (id: string): Promise<{ success: boolean }> =>
-    net(() => mock.removeForm(id)),
+  list: (params?: any) =>
+    api.get("/forms", { params }).then((r) => r.data.data.forms),
+  get: (id: string) => api.get(`/forms/${id}`).then((r) => r.data.data.form),
+  getPublic: (slug: string) =>
+    api.get(`/public/forms/${slug}`).then((r) => r.data.data.form),
+  create: (payload: any) =>
+    api.post("/forms", payload).then((r) => r.data.data.form),
+  update: (id: string, payload: any) =>
+    api.put(`/forms/${id}`, payload).then((r) => r.data.data.form),
+  publish: (id: string, publish = true) =>
+    api.post(`/forms/${id}/publish`, { publish }).then((r) => r.data.data.form),
+  duplicate: (id: string) =>
+    api.post(`/forms/${id}/duplicate`).then((r) => r.data.data.form),
+  remove: (id: string) => api.delete(`/forms/${id}`).then((r) => r.data),
 };
 
-// Response & analytics endpoints
+// --- Responses & analytics ---
 export const responseApi = {
-  submit: (
-    slug: string,
-    payload: Record<string, any>,
-  ): Promise<{ id: string }> =>
-    net(
-      () => (mock as any).submitResponse(slug, payload),
-      600 + Math.random() * 500,
-    ),
-  list: (
-    formId: string,
-    params?: Record<string, any>,
-  ): Promise<{ responses: FormResponseItem[] }> =>
-    net(() => (mock as any).listResponses(formId, params || {})),
-  analytics: (formId: string): Promise<FormAnalytics> =>
-    net(() => (mock as any).analytics(formId), 500 + Math.random() * 400),
-  remove: (id: string): Promise<{ success: boolean }> =>
-    net(() => mock.removeResponse(id)),
-  exportCsv: (formId: string): Promise<string> =>
-    net(() => mock.exportCsv(formId)),
+  submit: (slug: string, payload: any) =>
+    api.post(`/public/forms/${slug}/respond`, payload).then((r) => r.data.data),
+  list: (formId: string, params?: any) =>
+    api.get(`/forms/${formId}/responses`, { params }).then((r) => r.data.data),
+  analytics: (formId: string) =>
+    api.get(`/forms/${formId}/analytics`).then((r) => r.data.data.analytics),
+  remove: (id: string) => api.delete(`/responses/${id}`).then((r) => r.data),
+  exportCsv: (formId: string) =>
+    api
+      .get(`/forms/${formId}/responses/export`, { responseType: "text" })
+      .then((r) => r.data),
 };
 
-// AI generation endpoints
+// --- AI ---
 export const aiApi = {
-  generateForm: (prompt: string): Promise<Form> =>
-    slow(() => (mock as any).aiGenerateForm(prompt)),
-  generateValidation: (payload: {
-    label: string;
-    type: string;
-  }): Promise<FieldValidation> =>
-    slow(() => (mock as any).aiGenerateValidation(payload)),
-  improveQuestion: (payload: {
-    question: FormField;
-  }): Promise<AIImproveQuestionResult> =>
-    slow(() => (mock as any).aiImproveQuestion(payload)),
-  formSummary: (form: Form): Promise<AIFormSummaryResult> =>
-    slow(() => (mock as any).aiFormSummary(form)),
+  generateForm: (prompt: string) =>
+    api.post("/ai/generate-form", { prompt }).then((r) => r.data.data.form),
+  generateValidation: (payload: any) =>
+    api
+      .post("/ai/generate-validation", payload)
+      .then((r) => r.data.data.validation),
+  improveQuestion: (payload: any) =>
+    api.post("/ai/improve-question", payload).then((r) => r.data.data.result),
+  formSummary: (form: any) =>
+    api.post("/ai/form-summary", { form }).then((r) => r.data.data.summary),
 };
