@@ -518,7 +518,7 @@ const store: MockStore = {
   user: {
     id: "u_demo",
     name: "Alex Carter",
-    email: "alex@intake.dev",
+    email: "alex@timetoprogram.dev",
     avatarColor: "#0c8b7c",
     createdAt: daysAgoDate(60),
   },

@@ -446,7 +446,7 @@ const seed = async () => {
   const user = await userRepo.createUser({
     name: "Alex Carter",
     email,
-    password: await bcrypt.hash("Test@1234", 10),
+    password: await bcrypt.hash("Test$1234", 10),
     avatarColor: "#0c8b7c",
   });
 
@@ -510,7 +510,7 @@ const seed = async () => {
   // Logs summary totals and credentials for local testing
   console.log("\n  Seed complete");
   console.log(`  ${FORMS.length} forms, ${totalResponses} responses`);
-  console.log("  Login → alex@timetoprogram.dev / Test@1234");
+  console.log("  Login → alex@timetoprogram.dev / Test$1234");
 
   // Closes the database pool connection and exits cleanly
   await pool.end();
